@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Skill Forge — Gerador de SKILL.md</title>
+<style>
+:root{
+  --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --border:#2a2f3a;
+  --text:#e8eaed; --muted:#9aa1ad; --accent:#ff7a45; --accent2:#ffb199;
+  --mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+  padding-top: env(safe-area-inset-top,0px);
+  padding-bottom: env(safe-area-inset-bottom,0px);
+  box-sizing:border-box;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f6f5f2; --panel:#ffffff; --panel2:#f0efe9; --border:#e2ded4;
+    --text:#1c1c1c; --muted:#6b6b6b; --accent:#d6551f; --accent2:#8a3512;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --border:#2a2f3a;
+  --text:#e8eaed; --muted:#9aa1ad; --accent:#ff7a45; --accent2:#ffb199;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  display:flex; flex-direction:column; min-height:100%;
+}
+header{
+  padding:20px 20px 10px; border-bottom:1px solid var(--border);
+}
+header h1{margin:0 0 4px; font-size:1.3rem; letter-spacing:-0.02em;}
+header p{margin:0; color:var(--muted); font-size:0.88rem;}
+main{
+  flex:1; display:grid; grid-template-columns:1fr 1fr; gap:0;
+  max-width:1200px; width:100%; margin:0 auto; padding:0;
+}
+@media (max-width:820px){ main{grid-template-columns:1fr;} }
+.panel{padding:20px; overflow-x:auto;}
+.form-panel{border-right:1px solid var(--border);}
+@media (max-width:820px){ .form-panel{border-right:none; border-bottom:1px solid var(--border);} }
+label{display:block; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); margin:14px 0 6px;}
+label:first-of-type{margin-top:0;}
+input, textarea, select{
+  width:100%; background:var(--panel2); border:1px solid var(--border); color:var(--text);
+  border-radius:8px; padding:10px 12px; font-size:0.92rem; font-family:inherit;
+}
+textarea{resize:vertical; min-height:70px; line-height:1.4;}
+input:focus, textarea:focus, select:focus{outline:2px solid var(--accent); outline-offset:1px;}
+.row{display:flex; gap:10px;}
+.row > div{flex:1;}
+.hint{font-size:0.75rem; color:var(--muted); margin-top:4px;}
+.example-block{
+  background:var(--panel2); border:1px solid var(--border); border-radius:8px;
+  padding:10px 12px; margin-top:8px;
+}
+.example-block textarea{background:transparent; border:none; padding:0;}
+.add-btn, .remove-btn{
+  background:none; border:1px dashed var(--border); color:var(--muted);
+  border-radius:6px; padding:6px 10px; font-size:0.78rem; cursor:pointer; margin-top:6px;
+}
+.remove-btn{border-color:transparent; color:var(--accent);}
+.add-btn:hover{border-color:var(--accent); color:var(--accent);}
+pre{
+  background:var(--panel2); border:1px solid var(--border); border-radius:10px;
+  padding:16px; font-family:var(--mono); font-size:0.8rem; line-height:1.5;
+  white-space:pre-wrap; word-break:break-word; max-height:70vh; overflow-y:auto;
+}
+.preview-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+.preview-header h2{margin:0; font-size:0.95rem; color:var(--muted); font-weight:600;}
+button.copy{
+  background:var(--accent); color:#111; border:none; border-radius:8px;
+  padding:9px 16px; font-size:0.85rem; font-weight:600; cursor:pointer;
+}
+button.copy:hover{background:var(--accent2);}
+button.copy.copied{background:#4caf7d; color:#fff;}
+.badge{
+  display:inline-block; font-size:0.7rem; color:var(--muted); border:1px solid var(--border);
+  border-radius:20px; padding:2px 10px; margin-left:8px;
+}
+footer{padding:14px 20px; text-align:center; color:var(--muted); font-size:0.72rem; border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div style="padding:14px 20px; border-bottom:1px solid var(--border); display:flex; gap:16px; align-items:center;">
+  <a href="index.html" style="color:var(--text); text-decoration:none; font-weight:600; font-size:0.9rem;">🔧 Skill Forge</a>
+  <a href="gerador.html" style="color:var(--text); text-decoration:none; font-size:0.85rem;">Gerador</a>
+  <a href="documentacao.html" style="color:var(--muted); text-decoration:none; font-size:0.85rem;">Documentação</a>
+</div>
+<header>
+  <h1>🔧 Gerador</h1>
+  <p>Preencha os campos e gere um <code>SKILL.md</code> pronto, no padrão usado por projetos como Superpowers e Claude Code Templates.</p>
+</header>
+
+<main>
+  <section class="panel form-panel">
+    <label for="name">Nome da skill (slug)</label>
+    <input id="name" placeholder="ex: pdf-relatorio-mensal" />
+    <div class="hint">Minúsculas, sem espaço, use hífen.</div>
+
+    <label for="title">Título curto</label>
+    <input id="title" placeholder="ex: Gerador de Relatório Mensal em PDF" />
+
+    <label for="description">Descrição / gatilhos (o campo mais importante)</label>
+    <textarea id="description" placeholder="Descreva quando essa skill deve ser usada, com exemplos de frases-gatilho. Ex: Use esta skill sempre que o usuário pedir um relatório mensal em PDF a partir de uma planilha de vendas...">Use esta skill sempre que o usuário pedir X. Gatilhos: menção a "Y", arquivos .ext, ou pedidos como "faça Z".</textarea>
+    <div class="hint">Isso é o que o agente lê para decidir se a skill se aplica — seja específico.</div>
+
+    <div class="row">
+      <div>
+        <label for="category">Categoria</label>
+        <select id="category">
+          <option>Documento / Arquivo</option>
+          <option>Automação</option>
+          <option>Dados / Planilha</option>
+          <option>Design / Frontend</option>
+          <option>Dev / Código</option>
+          <option>Pesquisa</option>
+          <option>Outra</option>
+        </select>
+      </div>
+      <div>
+        <label for="license">Licença</label>
+        <select id="license">
+          <option>MIT</option>
+          <option>Apache-2.0</option>
+          <option>Nenhuma / privada</option>
+        </select>
+      </div>
+    </div>
+
+    <label for="steps">Passos que a skill deve seguir (um por linha)</label>
+    <textarea id="steps" placeholder="1. Ler o arquivo de entrada&#10;2. Validar formato&#10;3. Gerar saída&#10;4. Confirmar com o usuário">Ler o contexto necessário
+Aplicar a lógica principal da skill
+Validar o resultado antes de entregar</textarea>
+
+    <label for="notes">Restrições / coisas a evitar (opcional)</label>
+    <textarea id="notes" placeholder="ex: nunca sobrescrever o arquivo original; sempre perguntar antes de enviar e-mails"></textarea>
+
+    <label for="author">Autor (opcional)</label>
+    <input id="author" placeholder="seu nome ou usuário" />
+  </section>
+
+  <section class="panel">
+    <div class="preview-header">
+      <h2>SKILL.md gerado <span class="badge">pré-visualização ao vivo</span></h2>
+      <button class="copy" id="copyBtn">Copiar</button>
+    </div>
+    <pre id="output"></pre>
+  </section>
+</main>
+
+<footer>Tudo roda no seu navegador — nada é enviado a nenhum servidor.</footer>
+
+<script>
+const ids = ['name','title','description','category','license','steps','notes','author'];
+const els = {};
+ids.forEach(id => els[id] = document.getElementById(id));
+const output = document.getElementById('output');
+const copyBtn = document.getElementById('copyBtn');
+
+function slugify(s){
+  return (s||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'minha-skill';
+}
+
+function render(){
+  const name = slugify(els.name.value || els.title.value);
+  const title = els.title.value.trim() || 'Minha Skill';
+  const desc = els.description.value.trim() || 'Descreva quando usar esta skill.';
+  const category = els.category.value;
+  const license = els.license.value;
+  const steps = els.steps.value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const notes = els.notes.value.trim();
+  const author = els.author.value.trim();
+
+  let md = `---\n`;
+  md += `name: ${name}\n`;
+  md += `description: ${desc.replace(/\n/g,' ')}\n`;
+  md += `category: ${category}\n`;
+  md += `license: ${license}\n`;
+  if(author) md += `author: ${author}\n`;
+  md += `---\n\n`;
+  md += `# ${title}\n\n`;
+  md += `## Quando usar\n\n${desc}\n\n`;
+  md += `## Passos\n\n`;
+  steps.forEach((s,i)=> md += `${i+1}. ${s}\n`);
+  if(notes){
+    md += `\n## Restrições\n\n${notes}\n`;
+  }
+  md += `\n## Estrutura sugerida do repositório\n\n`;
+  md += "```\n" + `${name}/\n  SKILL.md\n  scripts/\n  examples/\n` + "```\n";
+
+  output.textContent = md;
+}
+
+ids.forEach(id => els[id].addEventListener('input', render));
+render();
+
+copyBtn.addEventListener('click', async () => {
+  try{
+    await navigator.clipboard.writeText(output.textContent);
+    copyBtn.textContent = 'Copiado ✓';
+    copyBtn.classList.add('copied');
+    setTimeout(()=>{ copyBtn.textContent='Copiar'; copyBtn.classList.remove('copied'); }, 1600);
+  }catch(e){
+    copyBtn.textContent = 'Selecione e copie manualmente';
+  }
+});
+</script>
+</body>
+</html>

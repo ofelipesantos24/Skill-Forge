@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skill Forge — Documentação</title>
+<style>
+:root{
+  --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --border:#2a2f3a;
+  --text:#e8eaed; --muted:#9aa1ad; --accent:#ff7a45; --mono:'SFMono-Regular',Consolas,Menlo,monospace;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  line-height:1.65;
+}
+.topbar{
+  position:sticky; top:0; background:var(--bg); border-bottom:1px solid var(--border);
+  padding:14px 20px; display:flex; align-items:center; gap:16px; z-index:5;
+}
+.topbar a{ color:var(--muted); text-decoration:none; font-size:0.85rem; }
+.topbar a.home{ color:var(--text); font-weight:600; }
+.topbar a:hover{ color:var(--accent); }
+
+main{ max-width:760px; margin:0 auto; padding:30px 20px 60px; }
+h1{ font-size:1.7rem; margin-bottom:4px; }
+.subtitle{ color:var(--muted); margin-top:0; margin-bottom:30px; font-size:0.95rem; }
+
+h2{ font-size:1.15rem; margin-top:38px; border-bottom:1px solid var(--border); padding-bottom:8px; }
+h3{ font-size:1rem; color:var(--accent); margin-top:24px; }
+p{ color:#d5d8dd; }
+code{
+  background:var(--panel2); border:1px solid var(--border); border-radius:5px;
+  padding:1px 6px; font-family:var(--mono); font-size:0.85em;
+}
+pre{
+  background:var(--panel2); border:1px solid var(--border); border-radius:10px;
+  padding:16px; overflow-x:auto; font-family:var(--mono); font-size:0.8rem;
+}
+table{ width:100%; border-collapse:collapse; margin-top:12px; font-size:0.85rem; }
+th, td{ text-align:left; padding:10px; border-bottom:1px solid var(--border); vertical-align:top; }
+th{ color:var(--muted); font-weight:600; font-size:0.78rem; text-transform:uppercase; letter-spacing:.03em; }
+.tip{
+  background:var(--panel2); border:1px solid var(--border); border-left:3px solid var(--accent);
+  border-radius:8px; padding:14px 16px; margin:18px 0; font-size:0.88rem; color:var(--muted);
+}
+.tip b{ color:var(--text); }
+footer{ padding:20px; text-align:center; color:var(--muted); font-size:0.72rem; border-top:1px solid var(--border); }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="home" href="index.html">🔧 Skill Forge</a>
+  <a href="gerador.html">Gerador</a>
+  <a href="documentacao.html">Documentação</a>
+</div>
+
+<main>
+  <h1>Documentação</h1>
+  <p class="subtitle">Como o Skill Forge funciona e como escrever um SKILL.md que o agente realmente vai usar corretamente.</p>
+
+  <h2>O que é um SKILL.md</h2>
+  <p>É um arquivo de metadados + instruções que ensina um agente (como o Claude Code) a reconhecer quando uma tarefa se encaixa em uma "skill" específica e como executá-la. Ele fica geralmente em uma pasta própria, por exemplo:</p>
+  <pre>minha-skill/
+  SKILL.md
+  scripts/
+  examples/</pre>
+
+  <h2>Campos do gerador</h2>
+  <table>
+    <tr><th>Campo</th><th>Para que serve</th></tr>
+    <tr><td><code>name</code></td><td>Identificador único da skill (slug). Usado internamente pelo agente e por marketplaces de skills.</td></tr>
+    <tr><td><code>description</code></td><td>O campo mais importante. É o que o agente lê para decidir <b>se</b> deve carregar essa skill. Deve conter gatilhos claros — frases, palavras-chave ou tipos de arquivo que indicam que a skill se aplica.</td></tr>
+    <tr><td><code>category</code></td><td>Ajuda humanos (e marketplaces) a organizar e descobrir a skill.</td></tr>
+    <tr><td><code>license</code></td><td>Relevante se você for publicar a skill publicamente.</td></tr>
+    <tr><td><code>steps</code></td><td>Sequência que o agente deve seguir ao executar a skill — vira uma lista numerada no corpo do documento.</td></tr>
+    <tr><td><code>notes</code></td><td>Restrições explícitas — coisas que a skill nunca deve fazer, mesmo se parecer razoável no contexto.</td></tr>
+  </table>
+
+  <h2>Boas práticas para o campo "descrição"</h2>
+  <div class="tip">
+    <b>Regra de ouro:</b> a descrição é o que decide se a skill dispara ou não. Uma descrição vaga ("ajuda com documentos") faz a skill nunca disparar ou disparar demais.
+  </div>
+  <ul>
+    <li>Inclua exemplos concretos de pedidos do usuário que devem ativar a skill.</li>
+    <li>Mencione extensões de arquivo, nomes de ferramentas ou palavras-chave específicas, quando fizer sentido.</li>
+    <li>Diga também quando <b>não</b> usar a skill, se houver ambiguidade com outra skill parecida.</li>
+  </ul>
+
+  <h3>Exemplo de boa descrição</h3>
+  <pre>Use esta skill sempre que o usuário pedir para gerar um relatório
+mensal de vendas em PDF a partir de uma planilha CSV ou XLSX.
+Gatilhos: "relatório mensal", "fechamento do mês", arquivos .csv/.xlsx
+anexados junto com um pedido de resumo. Não usar para relatórios
+anuais (ver skill "relatorio-anual").</pre>
+
+  <h2>Estrutura recomendada do repositório</h2>
+  <p>Ao publicar sua skill (por exemplo em um marketplace de plugins do Claude Code), mantenha uma pasta por skill, com o <code>SKILL.md</code> na raiz dela e scripts auxiliares em <code>scripts/</code>. Isso segue o mesmo padrão usado por projetos como <code>obra/superpowers</code>.</p>
+
+  <h2>Usando o gerador</h2>
+  <p>Abra <a href="gerador.html">gerador.html</a>, preencha os campos à esquerda e o SKILL.md aparece pronto à direita, atualizado em tempo real. Use o botão <b>Copiar</b> e cole em um arquivo <code>SKILL.md</code> na pasta da sua skill.</p>
+
+  <div class="tip">Este site é 100% estático — nenhum campo que você preenche é enviado para fora do navegador.</div>
+</main>
+
+<footer>Skill Forge · Documentação</footer>
+</body>
+</html>
